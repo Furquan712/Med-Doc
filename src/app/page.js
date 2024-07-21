@@ -14,6 +14,7 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [response, setResponse] = useState("");
   const [analyzeClicked, setAnalyzeClicked] = useState(false);
+  const [showWarning, setShowWarning] = useState(false);
 
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
@@ -39,10 +40,11 @@ export default function Home() {
   };
 
   const aiRun = async () => {
-    const prompt = `Consider you are a medical expert. Analyze this medical report like a medical expert. Provide recommendations for precautions and suggest foods that can help improve the patient's health based on the findings and give what should avoid in very easy language and give response both english and easy hindi.
+    const prompt = `Consider you are a medical expert. Analyze this medical report like a medical expert. Provide recommendations for precautions and suggest foods that can help improve the patient's health based on the findings and give what should avoid in very easy language.
     Here is the text of the medical report:\n\n${text}
     
-    And at the end suggest report how many suffering from this India give Data and Stats`;
+    And at the end suggest report how many suffering from this India give Data and Stats
+    And Give Complete response first in english and and then in easy Hindi like hinglish. So Everyone can understand easily`;
     try {
       const result = await model.generateContent(prompt);
       const responseText = await result.response.text();
@@ -53,7 +55,12 @@ export default function Home() {
   };
 
   const handleAnalyzeClick = () => {
+    if (!image) {
+      setShowWarning(true);
+      return;
+    }
     setAnalyzeClicked(true);
+    setShowWarning(false);
     aiRun();
   };
 
@@ -103,6 +110,9 @@ export default function Home() {
           />
         </label>
       </div>
+      {showWarning && (
+        <p className="mt-2 text-red-600">Please first upload your medical report</p>
+      )}
       <div className="mt-4">
         {loading ? (
           <p>Loading...</p>
