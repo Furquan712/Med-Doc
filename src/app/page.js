@@ -1,50 +1,19 @@
 "use client";
 
 import Tesseract from "tesseract.js";
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import ReactMarkdown from 'react-markdown';
+
 const genAI = new GoogleGenerativeAI('AIzaSyAHNSEMKs5tvrvUK2ExaHeDb-1Cfr2BHhc');
 const model = genAI.getGenerativeModel({ model: "gemini-pro" });
-
- 
-
-function classNames(...classes) {
-  return classes.filter(Boolean).join(' ')
-}
 
 export default function Home() {
   const [image, setImage] = useState(null);
   const [text, setText] = useState("");
   const [loading, setLoading] = useState(false);
-  const[response, setResponse] = useState("Loading")
-const [showText, setShowText] = useState(false); // State to control text visibility
-const [predicted, setpredicted]= useState("Loading")
-const API_KEY = 'b6778e4b19a87c7521df76ed24c525f6';
-
-async function PredictaiRun() {
-  const prompt = `I am farmer Suggest me 3 best crop in JSON format like {} of Key Value Format on these Parameter Now currently, here is parameter ${selectedCity} according to these 
-  parameter:
-  * **Salinity:**  
-  * **Sodicity:**  
-  * **pH:**  
-  * **Temperature Range:**  
-  * **Sea level:**  
-  * **Ground Level:**  
-  * **Humidity:**  
-  * **Soil Drainage:**
-  Suggest me 3 best crop to grow in JSON format like {} of Key Value Format , key should be crop name and value should be why to producse
-  `;
-  const result = await model.generateContent(prompt);
-  const response= await result.response;
-  const text = response.text();
-  console.log("Response of pridict:", text)
-  setpredicted(text)
-}
-
-
-useEffect(() => { 
-  PredictaiRun();
-}, []);
+  const [response, setResponse] = useState("");
+  const [analyzeClicked, setAnalyzeClicked] = useState(false);
 
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
@@ -56,13 +25,9 @@ useEffect(() => {
 
   const extractText = (file) => {
     setLoading(true);
-    Tesseract.recognize(
-      file,
-      "eng",
-      {
-        logger: (m) => console.log(m),
-      }
-    )
+    Tesseract.recognize(file, "eng", {
+      logger: (m) => console.log(m),
+    })
     .then(({ data: { text } }) => {
       setText(text);
       setLoading(false);
@@ -73,8 +38,33 @@ useEffect(() => {
     });
   };
 
+  const aiRun = async () => {
+    const prompt = `Consider you are a medical expert. Analyze this medical report like a medical expert. Provide recommendations for precautions and suggest foods that can help improve the patient's health based on the findings.
+    Here is the text of the medical report:\n\n${text}`;
+    try {
+      const result = await model.generateContent(prompt);
+      const responseText = await result.response.text();
+      setResponse(responseText);
+    } catch (error) {
+      console.error("AI generation error:", error);
+    }
+  };
+
+  const handleAnalyzeClick = () => {
+    setAnalyzeClicked(true);
+    aiRun();
+  };
+
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
+      <div>
+        <h1 className="mb-4 text-3xl font-extrabold text-gray-900 dark:text-white md:text-5xl lg:text-6xl">
+          <span className="text-transparent bg-clip-text bg-gradient-to-r to-emerald-600 from-sky-400">Med-Doc:</span> Transform Your Health with AI-Powered Insights
+        </h1>
+        <p className="text-lg font-normal text-gray-500 lg:text-xl dark:text-gray-400">
+          HealthGuard AI is your personal health advisor, utilizing advanced artificial intelligence to analyze medical reports with precision. Receive expert recommendations on precautions and discover tailored dietary suggestions to enhance your well-being. Empower your health journey with actionable insights and personalized guidance.
+        </p>
+      </div>
       <div className="flex items-center justify-center w-full">
         <label
           htmlFor="dropzone-file"
@@ -111,19 +101,27 @@ useEffect(() => {
           />
         </label>
       </div>
-     <div>
-     {loading ? (
-        <p>Loading...</p>
-      ) : (
-        <div className="mt-4">
-          {image && <img src={image} alt="Uploaded" className="mb-4" />}
-          {text && <p className="text-center text-gray-700">{text}</p>}
+      <div>
+        {loading ? (
+          <p>Loading...</p>
+        ) : (
+          <div className="mt-4">
+            {image && <img src={image} alt="Uploaded" className="mb-4" />}
+          </div>
+        )}
+      </div>
+      <button
+        onClick={handleAnalyzeClick}
+        className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700"
+      >
+        Analyze Report
+      </button>
+      {analyzeClicked && (
+        <div className="mt-4 p-4 border border-gray-300 rounded-lg">
+          <h2 className="text-xl font-semibold">AI Analysis</h2>
+          <ReactMarkdown>{response}</ReactMarkdown>
         </div>
       )}
-     </div>
-
-
-      
     </main>
   );
 }
