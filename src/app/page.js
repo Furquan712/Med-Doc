@@ -39,8 +39,10 @@ export default function Home() {
   };
 
   const aiRun = async () => {
-    const prompt = `Consider you are a medical expert. Analyze this medical report like a medical expert. Provide recommendations for precautions and suggest foods that can help improve the patient's health based on the findings.
-    Here is the text of the medical report:\n\n${text}`;
+    const prompt = `Consider you are a medical expert. Analyze this medical report like a medical expert. Provide recommendations for precautions and suggest foods that can help improve the patient's health based on the findings and give what should avoid in very easy language and give response both english and easy hindi.
+    Here is the text of the medical report:\n\n${text}
+    
+    And at the end suggest report how many suffering from this India give Data and Stats`;
     try {
       const result = await model.generateContent(prompt);
       const responseText = await result.response.text();
@@ -56,21 +58,21 @@ export default function Home() {
   };
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div>
-        <h1 className="mb-4 text-3xl font-extrabold text-gray-900 dark:text-white md:text-5xl lg:text-6xl">
+    <main className="flex min-h-screen flex-col items-center justify-between p-4 sm:p-8 md:p-12 lg:p-24">
+      <div className="text-center">
+        <h1 className="mb-4 text-2xl font-extrabold text-gray-900 dark:text-white md:text-3xl lg:text-4xl">
           <span className="text-transparent bg-clip-text bg-gradient-to-r to-emerald-600 from-sky-400">Med-Doc:</span> Transform Your Health with AI-Powered Insights
         </h1>
-        <p className="text-lg font-normal text-gray-500 lg:text-xl dark:text-gray-400">
+        <p className="text-base font-normal text-gray-500 lg:text-lg dark:text-gray-400">
           HealthGuard AI is your personal health advisor, utilizing advanced artificial intelligence to analyze medical reports with precision. Receive expert recommendations on precautions and discover tailored dietary suggestions to enhance your well-being. Empower your health journey with actionable insights and personalized guidance.
         </p>
       </div>
-      <div className="flex items-center justify-center w-full">
+      <div className="flex items-center justify-center w-full mt-4">
         <label
           htmlFor="dropzone-file"
-          className="flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-gray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600"
+          className="flex flex-col items-center justify-center w-full h-48 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-gray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600"
         >
-          <div className="flex flex-col items-center justify-center pt-5 pb-6">
+          <div className="flex flex-col items-center justify-center pt-4 pb-5">
             <svg
               className="w-8 h-8 mb-4 text-gray-500 dark:text-gray-400"
               aria-hidden="true"
@@ -101,24 +103,24 @@ export default function Home() {
           />
         </label>
       </div>
-      <div>
+      <div className="mt-4">
         {loading ? (
           <p>Loading...</p>
         ) : (
           <div className="mt-4">
-            {image && <img src={image} alt="Uploaded" className="mb-4" />}
+            {image && <img src={image} alt="Uploaded" className="w-full max-w-xs rounded-md shadow-md" />}
           </div>
         )}
       </div>
       <button
         onClick={handleAnalyzeClick}
-        className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700"
+        className="mt-4 px-6 py-2 bg-blue-500 text-white rounded hover:bg-blue-700 transition duration-200"
       >
         Analyze Report
       </button>
       {analyzeClicked && (
-        <div className="mt-4 p-4 border border-gray-300 rounded-lg">
-          <h2 className="text-xl font-semibold">AI Analysis</h2>
+        <div className="mt-4 p-4 border border-gray-300 rounded-lg shadow-lg max-w-full sm:max-w-md md:max-w-lg">
+          <h2 className="text-lg font-semibold mb-2">AI Analysis</h2>
           <ReactMarkdown>{response}</ReactMarkdown>
         </div>
       )}
